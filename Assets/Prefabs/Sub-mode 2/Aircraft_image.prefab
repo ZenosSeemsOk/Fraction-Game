@@ -136,3 +136,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Aircraft: {fileID: 8224712886907740004}
+  hit_Particle_sytem: {fileID: 450469707966138382, guid: 0b608b8191d55a242b7726ce89d6474b, type: 3}

@@ -1,10 +1,13 @@
 fileFormatVersion: 2
-guid: 8ee55cabaf70a7240903e72248da8c68
+guid: 46c26eb7b268d8046a7de28ba867618e
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 3576036833414651953
-    second: fire_ball_1_0
+      213: -8671796811053848909
+    second: Learn Fractions_0
+  - first:
+      213: 4905572941371640853
+    second: Learn Fractions_1
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -37,7 +40,7 @@ TextureImporter:
   maxTextureSize: 2048
   textureSettings:
     serializedVersion: 2
-    filterMode: 0
+    filterMode: 1
     aniso: 1
     mipBias: 0
     wrapU: 1
@@ -51,7 +54,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 200
+  spritePixelsToUnits: 100
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -75,7 +78,7 @@ TextureImporter:
     maxTextureSize: 2048
     resizeAlgorithm: 0
     textureFormat: -1
-    textureCompression: 0
+    textureCompression: 1
     compressionQuality: 50
     crunchedCompression: 0
     allowsAlphaSplitting: 0
@@ -139,12 +142,34 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: fire_ball_1_0
+      name: Learn Fractions_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 160
+        width: 212
+        height: 70
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      customData: 
+      outline: []
+      physicsShape: []
+      tessellationDetail: -1
+      bones: []
+      spriteID: 3b625c8deb697a780800000000000000
+      internalID: -8671796811053848909
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Learn Fractions_1
+      rect:
+        serializedVersion: 2
+        x: 215
+        y: 0
+        width: 348
         height: 71
       alignment: 0
       pivot: {x: 0, y: 0}
@@ -154,8 +179,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 130a467ad82a0a130800000000000000
-      internalID: 3576036833414651953
+      spriteID: 51c893e6998141440800000000000000
+      internalID: 4905572941371640853
       vertices: []
       indices: 
       edges: []
@@ -174,7 +199,8 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      fire_ball_1_0: 3576036833414651953
+      Learn Fractions_0: -8671796811053848909
+      Learn Fractions_1: 4905572941371640853
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

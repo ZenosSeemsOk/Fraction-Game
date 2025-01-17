@@ -7,6 +7,8 @@ TagManager:
   - Card
   - Position
   - Aircraft
+  - Projectile
+  - ScalePoint
   layers:
   - Default
   - TransparentFX

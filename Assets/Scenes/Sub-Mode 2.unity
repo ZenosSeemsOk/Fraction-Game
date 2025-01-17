@@ -2928,14 +2928,6 @@ PrefabInstance:
       propertyPath: cam
       value: 
       objectReference: {fileID: 923161747}
-    - target: {fileID: 3182274786449229635, guid: e8bbc7986a3662747a55c5eb627e4039, type: 3}
-      propertyPath: maxRotation
-      value: 45
-      objectReference: {fileID: 0}
-    - target: {fileID: 3182274786449229635, guid: e8bbc7986a3662747a55c5eb627e4039, type: 3}
-      propertyPath: minRotation
-      value: -45
-      objectReference: {fileID: 0}
     - target: {fileID: 5653036022810465699, guid: e8bbc7986a3662747a55c5eb627e4039, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.03

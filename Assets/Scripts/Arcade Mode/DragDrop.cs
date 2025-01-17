@@ -9,6 +9,8 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     private bool isHit;
     private float snappedValue;
     public bool snapCheck;
+    public int mistakeCount;
+    public int lastSnapCount;
     public float value;
     CardSpawner spawner;
     private void Awake()
@@ -19,6 +21,7 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     private void Start()
     {
         spawner = CardSpawner.Instance;
+        spawner.OnSanpped.AddListener(WrongReset);
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -63,16 +66,17 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if (other.tag == "Position")
+        if (other.tag == "Position" || other.tag == "ScalePoint")
         {
             snap = other.GetComponent<SnapToPosition>();
-            snappedValue = snap.value;
             spawner.snapCount++;
 
-            if (snappedValue == value && !snap.isSnapped)
+            if (snap.value == value && !snap.isSnapped)
             {
+                isHit = true;
                 Debug.Log(snap.isSnapped);
                 snap.isSnapped = true;
+                spawner.OnSanpped.Invoke();
                 if (spawner.snapCount == spawner.numberOfCards)
                 {
 
@@ -81,21 +85,30 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
                 {
                     spawner.CheckGameOver();
                 }
-                isHit = true;
+
                 //Debug.Log("Snap point detected: " + snap.transform.position + " with value: " + snappedValue);
             }
             else
             {
                 Debug.Log(snap.isSnapped);
                 isHit = false; // If values don't match, don't allow snapping
+                if(other.tag == "ScalePoint")
+                {
+                    mistakeCount++;
+                }
+
                 Debug.Log("Value mismatch at snap point.");
+                if(mistakeCount >= 4)
+                {
+                    WrongCard();
+                }
             }
         }
     }
 
     private void OnTriggerExit2D(Collider2D other)
     {
-        if (other.tag == "Position")
+        if (other.tag == "ScalePoint" || other.tag == "Position")
         {
             spawner.snapCount--;
             spawner.CheckGameOver();
@@ -103,5 +116,15 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             isHit = false; // Reset when exiting snap area
             //Debug.Log("Exited snap point area.");
         }
+    }
+
+    public void WrongCard()
+    {
+        Debug.Log("4 times wrong");
+    }
+
+    public void WrongReset()
+    {
+        mistakeCount = 0;
     }
 }

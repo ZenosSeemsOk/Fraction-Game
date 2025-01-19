@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 2890697217141002907}
   - component: {fileID: 300707094574959624}
   m_Layer: 0
-  m_Name: Bullet
+  m_Name: Arrow
   m_TagString: Projectile
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -122,7 +122,7 @@ GameObject:
   - component: {fileID: 7438262073740056869}
   - component: {fileID: 7655442339638788449}
   m_Layer: 0
-  m_Name: Bullet_Visual
+  m_Name: Arrow_Visual
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -187,7 +187,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 2641698482785147981, guid: 291390f821dd2ff41a6868cfc1ef1e72, type: 3}
+  m_Sprite: {fileID: 7674444457697963803, guid: 44f177a0ac0c5d64487d6ee89acd8f18, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

@@ -3,36 +3,70 @@ using UnityEngine;
 public class AntiAircraftLauncher : MonoBehaviour
 {
     [SerializeField] private GameObject Projectile;
+    [SerializeField] private GameObject trajectory;
     [SerializeField] private Transform shootPoint;
     [SerializeField] private Camera cam;
     private float currenttime;
-    private Vector3 mousePos;
 
     // Define the rotation limits (in degrees)
     [SerializeField] private float minRotation = -45f;
     [SerializeField] private float maxRotation = 45f;
 
+    // Variables to track rotation and interaction
+    private bool isHolding = false;
+    private bool isSelected = false;
+
     void Update()
     {
-        // Get mouse position in world space
-        mousePos = cam.ScreenToWorldPoint(Input.mousePosition);
-        mousePos.z = 0; // Ensure the z-coordinate is 0 for 2D rotation
+        // Detect click on the launcher
+        if (Input.GetMouseButtonDown(0))
+        {
+            Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+            RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
-        // Calculate the direction to look at
-        Vector3 lookDir = mousePos - transform.position;
-        float angle = Mathf.Atan2(lookDir.y, lookDir.x) * Mathf.Rad2Deg - 90f;
+            if (hit.collider != null && hit.collider.gameObject == gameObject)
+            {
+                isSelected = true;
+                isHolding = true;
+
+                trajectory.SetActive(true); // Show trajectory when aiming
+            }
+        }
+
+        // Rotate the launcher while holding the mouse button
+        if (isHolding)
+        {
+            RotateLauncher();
+        }
+
+        // Release logic
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (isSelected && isHolding)
+            {
+                Shoot();
+            }
+
+            isSelected = false;
+            isHolding = false;
+            trajectory.SetActive(false); // Hide trajectory after releasing the mouse
+        }
+    }
+
+    void RotateLauncher()
+    {
+        Vector3 mousePosition = cam.ScreenToWorldPoint(Input.mousePosition);
+        mousePosition.z = 0; // To Ensure 2D rotation
+
+        // Calculate the direction opposite to the mouse position
+        Vector3 direction = transform.position - mousePosition; // Inverted direction
+        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
 
         // Clamp the angle within the specified range
         angle = Mathf.Clamp(angle, minRotation, maxRotation);
 
-        // Rotate the object towards the mouse position but within the clamped range
+        // Rotate the launcher
         transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
-
-        // Check if space is pressed and then shoot
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Shoot();
-        }
     }
 
     void Shoot()
@@ -49,7 +83,7 @@ public class AntiAircraftLauncher : MonoBehaviour
             // Update the current time to enforce cooldown
             currenttime = Time.time;
 
-            // Destroy the bullet after 3 seconds
+            // Destroy the bullet after 2 seconds
             if (bullet != null)
             {
                 Destroy(bullet, 2);

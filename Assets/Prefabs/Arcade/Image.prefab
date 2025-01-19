@@ -169,6 +169,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   snapCheck: 0
+  mistakeCount: 0
+  lastSnapCount: 0
   value: 0
 --- !u!114 &722588809191280197
 MonoBehaviour:
@@ -186,7 +188,7 @@ MonoBehaviour:
   TextMesh_2: {fileID: 8758362378564313661}
   DragDrop: {fileID: 7777595711807633504}
   SnapToPosition: {fileID: 490357908686545580}
-  scaleDivisions: 12
+  scaleDivisions: 11
   Fraction: 0
 --- !u!212 &2156250226481661901
 SpriteRenderer:

@@ -12,7 +12,8 @@ public class CardSpawner : MonoBehaviour
     [SerializeField] private Sprite[] sourceImages; // Array of sprites for the source images
     public int numberOfCards = 15; // Total cards to spawn
     public int snapCount;
-    public static CardSpawner Instance;
+    public int scaleDivisions = 4;
+    public static CardSpawner Instance { get; private set; }
     public UnityEvent OnSanpped = new UnityEvent();
 
    

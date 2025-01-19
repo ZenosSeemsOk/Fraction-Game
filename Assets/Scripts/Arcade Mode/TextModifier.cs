@@ -10,7 +10,6 @@ public class TextModifier : MonoBehaviour
     [SerializeField] private TextMeshProUGUI TextMesh_2;
     public DragDrop2D DragDrop;
     public SnapToPosition SnapToPosition;
-    public int scaleDivisions = 4; // Number of divisions on the scale (e.g., quarters)
     public float Fraction;
 
     private static HashSet<string> usedFractions = new HashSet<string>(); // Track used fractions
@@ -28,7 +27,7 @@ public class TextModifier : MonoBehaviour
         do
         {
             // Base denominator based on scale divisions
-            int baseDeno = scaleDivisions;
+            int baseDeno = CardSpawner.Instance.scaleDivisions;
 
             // Generate numerator for base fraction
             int baseNume = Random.Range(1, baseDeno + 1);

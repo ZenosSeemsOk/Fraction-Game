@@ -13,8 +13,13 @@ public class AntiAircraftLauncher : MonoBehaviour
     [SerializeField] private float maxRotation = 45f;
 
     // Variables to track rotation and interaction
-    private bool isHolding = false;
+    public  bool isHolding = false;
     private bool isSelected = false;
+
+    private void Start()
+    {
+        isHolding = false;
+    }
 
     void Update()
     {

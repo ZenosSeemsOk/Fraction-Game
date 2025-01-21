@@ -4,6 +4,9 @@ using TMPro;
 public class LineDivider : MonoBehaviour
 {
     public int Level;
+    public int impDenoValue;
+    public int impNumeValue;
+    public int properDenoValue;
     [SerializeField] Transform startMarker;
     [SerializeField] Transform endMarker;
     [SerializeField] GameObject linePrefab;
@@ -28,8 +31,7 @@ public class LineDivider : MonoBehaviour
 
     public void submit()
     {
-        string txt = denominatorField.text;
-        int denominator = int.Parse(txt);
+        int denominator = properDenoValue;
         if (denominator >= 10)
         {
             size.x = 1400f;
@@ -118,10 +120,9 @@ public class LineDivider : MonoBehaviour
 
     public void submitImproper()
     {
-        string denoTxt=improperDemoninatorField.text;
-        string numeTxt=improperNumeratorField.text;
-        int denominator = int.Parse(denoTxt);
-        int numerator=int.Parse(numeTxt);
+
+        int denominator = impDenoValue;
+        int numerator= impNumeValue;
         if(numerator>denominator)
         {
             value1Txt.SetActive(false);

@@ -9,6 +9,9 @@ TagManager:
   - Aircraft
   - Projectile
   - ScalePoint
+  - Number Holder Numerator
+  - Number Holder Denominator
+  - Denominator Holder
   layers:
   - Default
   - TransparentFX

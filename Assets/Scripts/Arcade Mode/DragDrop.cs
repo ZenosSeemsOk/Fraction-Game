@@ -1,5 +1,7 @@
 using UnityEngine;
+using TMPro;
 using UnityEngine.EventSystems;
+using System.Collections;
 
 public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -21,7 +23,10 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     private void Start()
     {
         spawner = CardSpawner.Instance;
+        if (spawner != null)
+        {
         spawner.OnSanpped.AddListener(WrongReset);
+        }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -51,7 +56,7 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             // Position the card so that its top aligns with the snap point
             Vector3 newPosition = snap.transform.position - new Vector3(0, offsetY, 0);
             transform.position = newPosition;
-            if(spawner.snapCount == spawner.numberOfCards)
+            if (spawner.snapCount == spawner.numberOfCards)
             {
                 spawner.CheckGameOver();
             }
@@ -92,13 +97,13 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             {
                 Debug.Log(snap.isSnapped);
                 isHit = false; // If values don't match, don't allow snapping
-                if(other.tag == "ScalePoint")
+                if (other.tag == "ScalePoint")
                 {
                     mistakeCount++;
                 }
 
                 Debug.Log("Value mismatch at snap point.");
-                if(mistakeCount >= 4)
+                if (mistakeCount >= 4)
                 {
                     WrongCard();
                 }
@@ -114,17 +119,32 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             spawner.CheckGameOver();
             snap.isSnapped = false;
             isHit = false; // Reset when exiting snap area
-            //Debug.Log("Exited snap point area.");
+                           //Debug.Log("Exited snap point area.");
         }
     }
 
     public void WrongCard()
     {
         Debug.Log("4 times wrong");
+
+        // Find all objects with the tag "Position" or "ScalePoint"
+        SnapToPosition[] allSnapPoints = FindObjectsByType<SnapToPosition>(FindObjectsSortMode.None);
+
+        foreach (SnapToPosition snapPoint in allSnapPoints)
+        {
+            // Check if the value matches and the answer key is not already enabled
+            if (snapPoint.value == value && snapPoint.answerKey != null && !snapPoint.answerKey.activeSelf)
+            {
+                // Enable the answerKey GameObject
+                snapPoint.answerKey.SetActive(true);
+                Debug.Log($"Answer key enabled for snap point with value: {snapPoint.value}");
+            }
+        }
     }
 
     public void WrongReset()
     {
         mistakeCount = 0;
     }
+
 }

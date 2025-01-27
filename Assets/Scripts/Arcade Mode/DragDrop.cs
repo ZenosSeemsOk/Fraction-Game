@@ -25,7 +25,7 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         spawner = CardSpawner.Instance;
         if (spawner != null)
         {
-        spawner.OnSanpped.AddListener(WrongReset);
+        spawner.OnSnapped.AddListener(WrongReset);
         }
     }
 
@@ -81,7 +81,7 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
                 isHit = true;
                 Debug.Log(snap.isSnapped);
                 snap.isSnapped = true;
-                spawner.OnSanpped.Invoke();
+                spawner.OnSnapped.Invoke();
                 if (spawner.snapCount == spawner.numberOfCards)
                 {
 
@@ -133,10 +133,11 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         foreach (SnapToPosition snapPoint in allSnapPoints)
         {
             // Check if the value matches and the answer key is not already enabled
-            if (snapPoint.value == value && snapPoint.answerKey != null && !snapPoint.answerKey.activeSelf)
+            if (snapPoint.value == value && snapPoint.answerKey != null && !snapPoint.answerKey.activeSelf && snapPoint.glow != null && !snapPoint.glow.activeSelf)
             {
                 // Enable the answerKey GameObject
                 snapPoint.answerKey.SetActive(true);
+                snapPoint.glow.SetActive(true);
                 Debug.Log($"Answer key enabled for snap point with value: {snapPoint.value}");
             }
         }
@@ -145,6 +146,22 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     public void WrongReset()
     {
         mistakeCount = 0;
+        // Find all objects with the tag "Position" or "ScalePoint"
+        SnapToPosition[] allSnapPoints = FindObjectsByType<SnapToPosition>(FindObjectsSortMode.None);
+
+        foreach (SnapToPosition snapPoint in allSnapPoints)
+        {
+            // Disable the answerKey and glow if they are active
+            if (snapPoint.answerKey != null && snapPoint.answerKey.activeSelf)
+            {
+                snapPoint.answerKey.SetActive(false);
+            }
+
+            if (snapPoint.glow != null && snapPoint.glow.activeSelf)
+            {
+                snapPoint.glow.SetActive(false);
+            }
+        }
     }
 
 }

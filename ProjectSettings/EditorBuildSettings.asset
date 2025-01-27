@@ -8,6 +8,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Arcade Mode.unity
     guid: 8c9cfa26abfee488c85f1582747f6a02
+  - enabled: 1
+    path: Assets/Scenes/Tutorial.unity
+    guid: d911e31821b63b643aa7d9d9453b5ec9
+  - enabled: 1
+    path: Assets/Scenes/Sub-level-Selection.unity
+    guid: 79b63c945fd553e42b1d48cc535a2104
+  - enabled: 1
+    path: Assets/Scenes/Sub-Mode 2.unity
+    guid: 8849a7d7d563d8f42970658cb8acc354
+  - enabled: 1
+    path: Assets/Scenes/LevelSelection.unity
+    guid: ceafb3aabedc8d243825d051289f99c0
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   m_UseUCBPForAssetBundles: 0

@@ -2,21 +2,28 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
+using UnityEditor.Build.Content;
 
 public class CardSpawner : MonoBehaviour
 {
     [Header("Card Settings")]
-    [SerializeField] private GameObject cardPrefab; // The card prefab
-    [SerializeField] private Transform parentTransform; // Parent object to organize cards in the hierarchy
-    [SerializeField] private Transform[] spawnPoints; // Array of predefined spawn points
-    [SerializeField] private Sprite[] sourceImages; // Array of sprites for the source images
-    public int numberOfCards = 15; // Total cards to spawn
+    [SerializeField] private GameObject[] scalePrefab; // Array of scale prefabs for different divisions
+    [SerializeField] private GameObject cardPrefab; // Prefab for cards
+    [SerializeField] private Transform parentTransform; // Parent object for spawned cards
+    [SerializeField] private Transform[] spawnPoints; // Spawn points for cards
+    [SerializeField] private Sprite[] sourceImages; // Images to assign to cards
+    public int numberOfCards = 15;
     public int snapCount;
-    public int scaleDivisions = 4;
+    public int scaleDivisions = 7; // Default value is 11 for level 1
     public static CardSpawner Instance { get; private set; }
-    public UnityEvent OnSanpped = new UnityEvent();
+    public UnityEvent OnSnapped = new UnityEvent();
+    private GameManager gm;
+    private LevelSelection levelSelection;
 
-   
+    //[SerializeField] private SubLevelCompletionManager subLevelCompletionManager; // Reference to SubLevelCompletionManager
+
+    private int previousScaleDivisions; // To track changes in scale divisions
+
     private void Awake()
     {
         Instance = this;
@@ -24,42 +31,111 @@ public class CardSpawner : MonoBehaviour
 
     private void Start()
     {
+        levelSelection = LevelSelection.Instance;
+        gm = GameManager.instance;
+        if (gm == null)
+        {
+            Debug.LogError("GameManager instance is not assigned.");
+            return;
+        }
+        Debug.Log("GameManager instance found.");
+        switch (levelSelection.checkLevelIndex)
+        {
+            case 1:
+                scaleDivisions = 8;
+                break;
+            case 2:
+                scaleDivisions = 9;
+                break;
+            case 3:
+                scaleDivisions = 10;
+                break;
+            case 4:
+                scaleDivisions = 11;
+                break;
+            case 5:
+                scaleDivisions = 12;
+                break;
+            default:
+                scaleDivisions = 7;
+                break;
+        }
+
+        SetScale();
+
+        // Spawn the cards
         SpawnCards();
+
+        // Validate SubLevelCompletionManager reference
     }
+
+    private void Update()
+    {
+        // Check if scaleDivisions has changed, and update the scale if needed
+        if (scaleDivisions != previousScaleDivisions)
+        {
+            SetScale();
+        }
+    }
+
+    private void SetScale()
+    {
+        foreach (var scale in scalePrefab)
+        {
+            scale.SetActive(false); // Deactivate all scale prefabs
+        }
+
+        switch (scaleDivisions)
+        {
+            case 7:
+                scalePrefab[0].SetActive(true);
+                break;
+            case 8:
+                scalePrefab[1].SetActive(true);
+                break;
+            case 9:
+                scalePrefab[2].SetActive(true);
+                break;
+            case 10:
+                scalePrefab[3].SetActive(true);
+                break;
+            case 11:
+                scalePrefab[4].SetActive(true);
+                break;
+            case 12:
+                scalePrefab[5].SetActive(true);
+                break;
+            default:
+                Debug.LogError("Invalid scale divisions: " + scaleDivisions);
+                break;
+        }
+
+        previousScaleDivisions = scaleDivisions;
+    }
+
 
     private void SpawnCards()
     {
-        // Ensure the number of spawn points and source images are sufficient
         if (spawnPoints.Length < numberOfCards || sourceImages.Length < numberOfCards)
         {
-            Debug.LogError("Not enough spawn points or source images for the number of cards to spawn.");
+            Debug.LogError("Not enough spawn points or source images for the number of cards.");
             return;
         }
 
         for (int i = 0; i < numberOfCards; i++)
         {
-            // Get the spawn position from the spawnPoints array
             Transform spawnPoint = spawnPoints[i];
-
-            // Instantiate the card at the spawn point
             GameObject newCard = Instantiate(cardPrefab, spawnPoint.position, Quaternion.identity, parentTransform);
-
-            // Assign a source image to the card
             AssignImageToCard(newCard, i);
-
-            // Assign a fraction value to the card
             AssignFractionToCard(newCard, i + 1);
         }
     }
 
     private void AssignImageToCard(GameObject card, int index)
     {
-        // Get the Image component from the card prefab
         Image cardImage = card.GetComponentInChildren<Image>();
-
         if (cardImage != null)
         {
-            // Assign a source image based on the index
             cardImage.sprite = sourceImages[index];
         }
         else
@@ -70,23 +146,16 @@ public class CardSpawner : MonoBehaviour
 
     private void AssignFractionToCard(GameObject card, int cardIndex)
     {
-        // Get the TextMeshProUGUI component from the card prefab
         TextMeshProUGUI textMesh = card.GetComponentInChildren<TextMeshProUGUI>();
-
         if (textMesh != null)
         {
-            // Generate a random fraction for the card
             int numerator = Random.Range(1, 5);
             int denominator = Random.Range(2, 6);
             float fraction = (float)numerator / denominator;
-
-            // Assign the fraction as text
             textMesh.text = numerator + "/" + denominator;
 
-            // Optionally: Assign the fraction value to a card script (if needed)
             DragDrop2D dragDrop = card.GetComponent<DragDrop2D>();
             SnapToPosition snapToPosition = card.GetComponent<SnapToPosition>();
-
             if (dragDrop != null) dragDrop.value = fraction;
             if (snapToPosition != null) snapToPosition.value = fraction;
         }
@@ -94,9 +163,9 @@ public class CardSpawner : MonoBehaviour
 
     public void CheckGameOver()
     {
-        if (snapCount == numberOfCards)
+        if (snapCount == 15)
         {
-            Debug.Log("Game Over");
+            gm.totalLevelUnlocked += 1;
         }
     }
 }

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using TMPro;
 using UnityEngine.EventSystems;
 using System.Collections;
@@ -7,17 +7,17 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
 {
     private Vector3 offset;
     private Camera mainCamera;
-    private SnapToPosition snap;
-    private bool isHit;
-    private float snappedValue;
-    public bool snapCheck;
+    private SnapToPosition currentSnap;
+    private bool isSnapped = false;
     public int mistakeCount;
-    public int lastSnapCount;
     public float value;
-    CardSpawner spawner;
+    private CardSpawner spawner;
+    private Vector3 originalPosition;
+
     private void Awake()
     {
-        mainCamera = Camera.main; // Get the main camera
+        mainCamera = Camera.main;
+        originalPosition = transform.position;
     }
 
     private void Start()
@@ -25,120 +25,153 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         spawner = CardSpawner.Instance;
         if (spawner != null)
         {
-        spawner.OnSnapped.AddListener(WrongReset);
+            spawner.OnSnapped.AddListener(WrongReset);
         }
     }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        // Calculate the offset between the object's position and the mouse click
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(eventData.position.x, eventData.position.y, mainCamera.nearClipPlane));
-        offset = transform.position - new Vector3(worldPosition.x, worldPosition.y, transform.position.z);
+        offset = transform.position - new Vector3(worldPosition.x, worldPosition.y, 0);
+
+        if (isSnapped && currentSnap != null)
+        {
+            spawner.snapCount = Mathf.Max(0, spawner.snapCount - 1);
+            currentSnap.isSnapped = false;
+            isSnapped = false;
+            spawner.CheckGameOver();
+        }
     }
 
     public void OnDrag(PointerEventData eventData)
     {
-        // Update the object's position to follow the mouse cursor in the 2D world
+        Vector3 screenBoundsMin = mainCamera.ScreenToWorldPoint(new Vector3(0, 0, mainCamera.nearClipPlane));
+        Vector3 screenBoundsMax = mainCamera.ScreenToWorldPoint(new Vector3(Screen.width, Screen.height, mainCamera.nearClipPlane));
+
+        float cardHeight = GetComponent<Renderer>().bounds.size.y;
+        float cardWidth = GetComponent<Renderer>().bounds.size.x;
+
         Vector3 worldPosition = mainCamera.ScreenToWorldPoint(new Vector3(eventData.position.x, eventData.position.y, mainCamera.nearClipPlane));
-        transform.position = new Vector3(worldPosition.x + offset.x, worldPosition.y + offset.y, transform.position.z);
+        Vector3 newPosition = new Vector3(
+            worldPosition.x + offset.x,
+            worldPosition.y + offset.y,
+            0 // Ensure consistent Z-position
+        );
+
+        newPosition.x = Mathf.Clamp(newPosition.x,
+            screenBoundsMin.x + cardWidth / 2,
+            screenBoundsMax.x - cardWidth / 2);
+        newPosition.y = Mathf.Clamp(newPosition.y,
+            screenBoundsMin.y + cardHeight / 2,
+            screenBoundsMax.y - cardHeight / 2);
+
+        transform.position = newPosition;
     }
 
     public void OnEndDrag(PointerEventData eventData)
     {
-        if (isHit)
+        SnapToPosition validSnap = FindValidSnapPoint();
+
+        if (validSnap != null)
         {
-            // Get the height of the card
-            float cardHeight = GetComponent<Renderer>().bounds.size.y;
-
-            // Calculate the offset (to adjust for top alignment)
-            float offsetY = cardHeight / 2;  // Offset to move from center to top
-
-            // Position the card so that its top aligns with the snap point
-            Vector3 newPosition = snap.transform.position - new Vector3(0, offsetY, 0);
-            transform.position = newPosition;
-            if (spawner.snapCount == spawner.numberOfCards)
-            {
-                spawner.CheckGameOver();
-            }
-            //Debug.Log("Card snapped to position: " + newPosition);
-            snapCheck = true;
+            SnapToPosition(validSnap);
         }
         else
         {
-            snapCheck = false;
-        }
-    }
-
-    private void OnTriggerEnter2D(Collider2D other)
-    {
-        if (other.tag == "Position" || other.tag == "ScalePoint")
-        {
-            snap = other.GetComponent<SnapToPosition>();
-            spawner.snapCount++;
-
-            if (snap.value == value && !snap.isSnapped)
+            if (!isSnapped)
             {
-                isHit = true;
-                Debug.Log(snap.isSnapped);
-                snap.isSnapped = true;
-                spawner.OnSnapped.Invoke();
-                if (spawner.snapCount == spawner.numberOfCards)
-                {
-
-                }
-                else
-                {
-                    spawner.CheckGameOver();
-                }
-
-                //Debug.Log("Snap point detected: " + snap.transform.position + " with value: " + snappedValue);
-            }
-            else
-            {
-                Debug.Log(snap.isSnapped);
-                isHit = false; // If values don't match, don't allow snapping
-                if (other.tag == "ScalePoint")
-                {
-                    mistakeCount++;
-                }
-
-                Debug.Log("Value mismatch at snap point.");
-                if (mistakeCount >= 4)
-                {
-                    WrongCard();
-                }
+                mistakeCount++;
+                CheckMistakes();
+                StartCoroutine(MoveBackToOriginalPosition());
             }
         }
     }
 
-    private void OnTriggerExit2D(Collider2D other)
+    private IEnumerator MoveBackToOriginalPosition()
     {
-        if (other.tag == "ScalePoint" || other.tag == "Position")
+        float duration = 0.5f;
+        float elapsed = 0f;
+        Vector3 startPosition = transform.position;
+
+        while (elapsed < duration)
         {
-            spawner.snapCount--;
+            transform.position = Vector3.Lerp(startPosition, originalPosition, elapsed / duration);
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+        transform.position = originalPosition;
+    }
+
+    private SnapToPosition FindValidSnapPoint()
+    {
+        Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(
+            transform.position,
+            1.0f // Increased detection radius
+        );
+
+        SnapToPosition closestSnap = null;
+        float closestDistance = Mathf.Infinity;
+
+        foreach (Collider2D collider in overlappingColliders)
+        {
+            if (!collider.CompareTag("Position") && !collider.CompareTag("ScalePoint"))
+                continue;
+
+            SnapToPosition snap = collider.GetComponent<SnapToPosition>();
+            if (snap != null && snap.value == value && !snap.isSnapped)
+            {
+                float distance = Vector2.Distance(transform.position, snap.transform.position);
+                if (distance < closestDistance)
+                {
+                    closestDistance = distance;
+                    closestSnap = snap;
+                }
+            }
+        }
+        return closestSnap;
+    }
+
+    private void SnapToPosition(SnapToPosition snap)
+    {
+        if (snap == null || snap.value != value) return;
+
+        transform.position = snap.transform.position;
+        currentSnap = snap;
+        currentSnap.isSnapped = true;
+        isSnapped = true;
+        spawner.snapCount++;
+        spawner.OnSnapped.Invoke();
+
+        if (spawner.snapCount == spawner.numberOfCards)
+        {
             spawner.CheckGameOver();
-            snap.isSnapped = false;
-            isHit = false; // Reset when exiting snap area
-                           //Debug.Log("Exited snap point area.");
         }
+    }
+
+    private void CheckMistakes()
+    {
+        if (mistakeCount >= 3)
+        {
+            WrongCard();
+            StartCoroutine(ResetMistakesAfterDelay());
+        }
+    }
+
+    private IEnumerator ResetMistakesAfterDelay()
+    {
+        yield return new WaitForSeconds(5f);
+        mistakeCount = 0;
     }
 
     public void WrongCard()
     {
-        Debug.Log("4 times wrong");
-
-        // Find all objects with the tag "Position" or "ScalePoint"
         SnapToPosition[] allSnapPoints = FindObjectsByType<SnapToPosition>(FindObjectsSortMode.None);
-
         foreach (SnapToPosition snapPoint in allSnapPoints)
         {
-            // Check if the value matches and the answer key is not already enabled
-            if (snapPoint.value == value && snapPoint.answerKey != null && !snapPoint.answerKey.activeSelf && snapPoint.glow != null && !snapPoint.glow.activeSelf)
+            if (snapPoint.value == value && !snapPoint.isSnapped)
             {
-                // Enable the answerKey GameObject
-                snapPoint.answerKey.SetActive(true);
-                snapPoint.glow.SetActive(true);
-                Debug.Log($"Answer key enabled for snap point with value: {snapPoint.value}");
+                if (snapPoint.answerKey != null) snapPoint.answerKey.SetActive(true);
+                if (snapPoint.glow != null) snapPoint.glow.SetActive(true);
             }
         }
     }
@@ -146,22 +179,11 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     public void WrongReset()
     {
         mistakeCount = 0;
-        // Find all objects with the tag "Position" or "ScalePoint"
         SnapToPosition[] allSnapPoints = FindObjectsByType<SnapToPosition>(FindObjectsSortMode.None);
-
         foreach (SnapToPosition snapPoint in allSnapPoints)
         {
-            // Disable the answerKey and glow if they are active
-            if (snapPoint.answerKey != null && snapPoint.answerKey.activeSelf)
-            {
-                snapPoint.answerKey.SetActive(false);
-            }
-
-            if (snapPoint.glow != null && snapPoint.glow.activeSelf)
-            {
-                snapPoint.glow.SetActive(false);
-            }
+            if (snapPoint.answerKey != null) snapPoint.answerKey.SetActive(false);
+            if (snapPoint.glow != null) snapPoint.glow.SetActive(false);
         }
     }
-
 }

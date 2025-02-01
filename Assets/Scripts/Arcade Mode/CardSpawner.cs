@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using TMPro;
-using UnityEditor.Build.Content;
+using System.Collections;
 
 public class CardSpawner : MonoBehaviour
 {
@@ -12,6 +12,7 @@ public class CardSpawner : MonoBehaviour
     [SerializeField] private Transform parentTransform; // Parent object for spawned cards
     [SerializeField] private Transform[] spawnPoints; // Spawn points for cards
     [SerializeField] private Sprite[] sourceImages; // Images to assign to cards
+    [SerializeField] private GameObject victoryCard;
     public int numberOfCards = 15;
     public int snapCount;
     public int scaleDivisions = 7; // Default value is 11 for level 1
@@ -19,8 +20,6 @@ public class CardSpawner : MonoBehaviour
     public UnityEvent OnSnapped = new UnityEvent();
     private GameManager gm;
     private LevelSelection levelSelection;
-
-    //[SerializeField] private SubLevelCompletionManager subLevelCompletionManager; // Reference to SubLevelCompletionManager
 
     private int previousScaleDivisions; // To track changes in scale divisions
 
@@ -38,6 +37,7 @@ public class CardSpawner : MonoBehaviour
             Debug.LogError("GameManager instance is not assigned.");
             return;
         }
+
         Debug.Log("GameManager instance found.");
         switch (levelSelection.checkLevelIndex)
         {
@@ -62,20 +62,7 @@ public class CardSpawner : MonoBehaviour
         }
 
         SetScale();
-
-        // Spawn the cards
         SpawnCards();
-
-        // Validate SubLevelCompletionManager reference
-    }
-
-    private void Update()
-    {
-        // Check if scaleDivisions has changed, and update the scale if needed
-        if (scaleDivisions != previousScaleDivisions)
-        {
-            SetScale();
-        }
     }
 
     private void SetScale()
@@ -113,7 +100,6 @@ public class CardSpawner : MonoBehaviour
         previousScaleDivisions = scaleDivisions;
     }
 
-
     private void SpawnCards()
     {
         if (spawnPoints.Length < numberOfCards || sourceImages.Length < numberOfCards)
@@ -149,23 +135,31 @@ public class CardSpawner : MonoBehaviour
         TextMeshProUGUI textMesh = card.GetComponentInChildren<TextMeshProUGUI>();
         if (textMesh != null)
         {
-            int numerator = Random.Range(1, 5);
-            int denominator = Random.Range(2, 6);
+            int numerator = Random.Range(1, scaleDivisions);
+            int denominator = scaleDivisions;
             float fraction = (float)numerator / denominator;
-            textMesh.text = numerator + "/" + denominator;
+            textMesh.text = $"{numerator}/{denominator}";
 
             DragDrop2D dragDrop = card.GetComponent<DragDrop2D>();
-            SnapToPosition snapToPosition = card.GetComponent<SnapToPosition>();
             if (dragDrop != null) dragDrop.value = fraction;
-            if (snapToPosition != null) snapToPosition.value = fraction;
         }
     }
 
     public void CheckGameOver()
     {
-        if (snapCount == 15)
+        if (snapCount == numberOfCards)
         {
-            gm.totalLevelUnlocked += 1;
+            StartCoroutine(ConfirmGameOver());
+        }
+    }
+
+    private IEnumerator ConfirmGameOver()
+    {
+        yield return new WaitForSeconds(0.5f); // Reduced delay
+        if (snapCount == numberOfCards)
+        {
+            Debug.Log("Game Over: Confirmed");
+            victoryCard.SetActive(true);
         }
     }
 }

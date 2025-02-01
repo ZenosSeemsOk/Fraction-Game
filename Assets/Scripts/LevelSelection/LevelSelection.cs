@@ -7,6 +7,9 @@ public class LevelSelection : MonoBehaviour
     private GameManager gm;
     public int checkLevelIndex;
     public static LevelSelection Instance;
+    [SerializeField] private Button settingsButton;
+    [SerializeField] private GameObject menubackButton;
+    [SerializeField] private GameObject levelbackButton;
     [SerializeField] private Button[] mainButtons;
     [SerializeField] private GameObject mainPanel;
     [SerializeField] private GameObject subPanel;
@@ -21,8 +24,14 @@ public class LevelSelection : MonoBehaviour
     private void Start()
     {
         gm = GameManager.instance;
-        InitializeSubButtonsArray();
-        UpdateButtons();
+        if(SceneManager.GetActiveScene().name == "LevelSelection")
+        {
+            InitializeSubButtonsArray();
+            UpdateButtons();
+            levelbackButton.SetActive(false);
+            menubackButton.SetActive(true);
+        }
+
     }
 
     private void InitializeSubButtonsArray()
@@ -41,28 +50,32 @@ public class LevelSelection : MonoBehaviour
 
     private void UpdateButtons()
     {
-        // Disable all level buttons and sub-buttons initially
-        foreach (Button btn in mainButtons)
+        if (SceneManager.GetActiveScene().name == "LevelSelection")
         {
-            btn.interactable = false;
-        }
-        foreach (Button[] subLevel in subButtons)
-        {
-            foreach (Button btn in subLevel)
+            // Disable all level buttons and sub-buttons initially
+            foreach (Button btn in mainButtons)
             {
                 btn.interactable = false;
             }
-        }
-        //Enable panels based on selected
+            foreach (Button[] subLevel in subButtons)
+            {
+                foreach (Button btn in subLevel)
+                {
+                    btn.interactable = false;
+                }
+            }
+            //Enable panels based on selected
 
-        // Enable levels and sublevels based on totalLevelUnlocked
-        int levelsUnlocked = Mathf.CeilToInt(gm.totalLevelUnlocked / 3f);
-        UnlockMainButtons(levelsUnlocked);
+            // Enable levels and sublevels based on totalLevelUnlocked
+            int levelsUnlocked = Mathf.CeilToInt(gm.totalLevelUnlocked / 3f);
+            UnlockMainButtons(levelsUnlocked);
 
-        for (int i = 0; i < levelsUnlocked; i++)
-        {
-            ActivateSubButtons(i);
+            for (int i = 0; i < levelsUnlocked; i++)
+            {
+                ActivateSubButtons(i);
+            }
         }
+
     }
 
     private void UnlockMainButtons(int levelsUnlocked)
@@ -75,11 +88,13 @@ public class LevelSelection : MonoBehaviour
 
     public void OpenSubPanel(int levelIndex)
     {
+        gm.levelindex = levelIndex;
         checkLevelIndex = levelIndex;
         // Hide the main panel and show the sub-panel
         mainPanel.SetActive(false);
         subPanel.SetActive(true);
-
+        menubackButton.SetActive(false);
+        levelbackButton.SetActive(true);
         // Activate the sub-buttons for the specific level
         ActivateSubButtons(levelIndex);
 
@@ -145,7 +160,14 @@ public class LevelSelection : MonoBehaviour
 
     public void BackToMainPanel()
     {
+        menubackButton.SetActive(true);
+        levelbackButton.SetActive(false);
         subPanel.SetActive(false);
         mainPanel.SetActive(true);
+    }
+
+    public void BackToMainMenu()
+    {
+        SceneManager.LoadScene("MainMenu");
     }
 }

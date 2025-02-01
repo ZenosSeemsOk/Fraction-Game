@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using System.Collections;
 
 public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
@@ -15,9 +16,8 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     private bool isDenominatorHolder;
     public int NumberValue;
     private Vector3 initialPos;
-
-    private bool isGameEnded = false; // Flag to track if the game has ended
-
+    private TutorialGameManager tGameManager;
+    private bool isResetting = false;
 
     private void Awake()
     {
@@ -26,11 +26,11 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
             mainCamera = Camera.main;
         }
         initialPos = transform.position;
-
     }
 
     private void Start()
     {
+        tGameManager = TutorialGameManager.Instance;
         gm = GameManager.instance;
         switch (gm.totalLevelUnlocked)
         {
@@ -55,13 +55,6 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         }
     }
 
-    private void Update()
-    {
-        if (!isGameEnded) // Only check for game end if the game hasn't ended yet
-        {
-            CheckGameEnd();
-        }
-    }
 
     public void OnBeginDrag(PointerEventData eventData)
     {
@@ -77,6 +70,7 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     public void OnEndDrag(PointerEventData eventData)
     {
+        Debug.Log("Function called");
         if ((isNumberHolderNumerator || isNumberHolderDenominator || isDenominatorHolder) && snap != null)
         {
             SnapToCorrectPosition();
@@ -84,16 +78,19 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         }
         else
         {
-            ResetPosition();
+            StartCoroutine(SmoothReset());
         }
     }
 
     private void SnapToCorrectPosition()
     {
+        if (snap == null) return;
+
+        Vector3 snapPosition = snap.transform.position;
         float cardHeight = GetComponent<Renderer>().bounds.size.y;
         float offsetY = cardHeight / 2;
-        Vector3 newPosition = snap.transform.position - new Vector3(0, offsetY, 0);
-        transform.position = new Vector3(newPosition.x, newPosition.y, 0f);
+
+        transform.position = new Vector3(snapPosition.x, snapPosition.y - offsetY, 0f);
     }
 
     private void UpdateLineDividerValues()
@@ -115,9 +112,24 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         }
     }
 
-    private void ResetPosition()
+    private IEnumerator SmoothReset()
     {
+        if (isResetting) yield break;
+        isResetting = true;
+
+        float elapsedTime = 0f;
+        float duration = 1f;
+        Vector3 startPosition = transform.position;
+
+        while (elapsedTime < duration)
+        {
+            transform.position = Vector3.Lerp(startPosition, initialPos, elapsedTime / duration);
+            elapsedTime += Time.deltaTime;
+            yield return null;
+        }
+
         transform.position = initialPos;
+        isResetting = false;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
@@ -153,25 +165,7 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         isNumberHolderDenominator = false;
         isDenominatorHolder = false;
         snap = null;
-        ResetPosition();
+        StartCoroutine(SmoothReset());
     }
 
-    private void CheckGameEnd()
-    {
-        if (lineDivider.properDenoValue == scaleValue && lineDivider.isSubmitted)
-        {
-            isGameEnded = true; // Mark the game as ended
-            Debug.Log("Game Ended");
-            OnGameEnd(); // Call the game-end logic
-        }
-    }
-
-    private void OnGameEnd()
-    {
-        if(isGameEnded)
-        {
-            gm.totalLevelUnlocked += 1;
-            SceneManager.LoadScene("LevelSelection");
-        }
-    }
 }

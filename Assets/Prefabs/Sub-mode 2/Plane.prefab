@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &2732056485814681019
+--- !u!1 &1833045246648233905
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,38 +8,38 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8990741643253070389}
-  - component: {fileID: 5566579949432352270}
-  - component: {fileID: 4868489078214523856}
+  - component: {fileID: 944549975409074699}
+  - component: {fileID: 2841853453595098064}
+  - component: {fileID: 8475432924702876043}
   m_Layer: 0
-  m_Name: Plane_visual
+  m_Name: PlaneCrash 1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 0
---- !u!4 &8990741643253070389
+--- !u!4 &944549975409074699
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2732056485814681019}
+  m_GameObject: {fileID: 1833045246648233905}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2986119893103910984}
+  m_Father: {fileID: 858937330581556742}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!212 &5566579949432352270
+--- !u!212 &2841853453595098064
 SpriteRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2732056485814681019}
+  m_GameObject: {fileID: 1833045246648233905}
   m_Enabled: 1
   m_CastShadows: 0
   m_ReceiveShadows: 0
@@ -82,23 +82,23 @@ SpriteRenderer:
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
-  m_Size: {x: 2, y: 2}
+  m_Size: {x: 16, y: 16}
   m_AdaptiveModeThreshold: 0.5
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!95 &4868489078214523856
+--- !u!95 &8475432924702876043
 Animator:
   serializedVersion: 7
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2732056485814681019}
+  m_GameObject: {fileID: 1833045246648233905}
   m_Enabled: 1
   m_Avatar: {fileID: 0}
-  m_Controller: {fileID: 9100000, guid: 38125cc749d4ca24b871aa8398d51c40, type: 2}
+  m_Controller: {fileID: 9100000, guid: e55b052c3b47c36409b3f4f99783b954, type: 2}
   m_CullingMode: 0
   m_UpdateMode: 0
   m_ApplyRootMotion: 0
@@ -110,7 +110,7 @@ Animator:
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorStateOnDisable: 0
   m_WriteDefaultValuesOnDisable: 0
---- !u!1 &5627164064817410623
+--- !u!1 &4052938469627486647
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -118,39 +118,39 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 2986119893103910984}
-  - component: {fileID: 5644334699714342526}
-  - component: {fileID: 1016880506332078853}
+  - component: {fileID: 858937330581556742}
+  - component: {fileID: 5090192706276072182}
+  - component: {fileID: 5230108430887822850}
   m_Layer: 0
   m_Name: Plane
-  m_TagString: Untagged
+  m_TagString: Aircraft
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &2986119893103910984
+--- !u!4 &858937330581556742
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5627164064817410623}
+  m_GameObject: {fileID: 4052938469627486647}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8990741643253070389}
+  - {fileID: 944549975409074699}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!61 &5644334699714342526
+--- !u!61 &5090192706276072182
 BoxCollider2D:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5627164064817410623}
+  m_GameObject: {fileID: 4052938469627486647}
   m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
@@ -178,7 +178,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: 0}
+  m_Offset: {x: -0.00000071525574, y: -0.000000029802322}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0, y: 0}
@@ -188,19 +188,20 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1}
+  m_Size: {x: 1.5999994, y: 0.99999994}
   m_EdgeRadius: 0
---- !u!114 &1016880506332078853
+--- !u!114 &5230108430887822850
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5627164064817410623}
+  m_GameObject: {fileID: 4052938469627486647}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 22d20564bc7e7284b93f31b667140512, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  m_Aircraft: {fileID: 2732056485814681019}
+  anim: {fileID: 8475432924702876043}
+  m_Aircraft: {fileID: 1833045246648233905}
   airCraftHit: 0

@@ -5,19 +5,24 @@ public class AntiAircraftLauncher : MonoBehaviour
     [SerializeField] private GameObject Projectile;
     [SerializeField] private GameObject trajectory;
     [SerializeField] private Transform shootPoint;
-    [SerializeField] private Camera cam;
+    [SerializeField] private RectTransform newShootPoint;
+    private Camera cam;
     private float currenttime;
 
     // Define the rotation limits (in degrees)
     [SerializeField] private float minRotation = -45f;
     [SerializeField] private float maxRotation = 45f;
 
+    // Rotation sensitivity (speed of rotation)
+    [SerializeField] private float rotationSensitivity = 5f;
+
     // Variables to track rotation and interaction
-    public  bool isHolding = false;
+    public bool isHolding = false;
     private bool isSelected = false;
 
     private void Start()
     {
+        cam = Camera.main;  // Assign the main camera automatically
         isHolding = false;
     }
 
@@ -65,13 +70,18 @@ public class AntiAircraftLauncher : MonoBehaviour
 
         // Calculate the direction opposite to the mouse position
         Vector3 direction = transform.position - mousePosition; // Inverted direction
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
+        float targetAngle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg - 90f;
 
         // Clamp the angle within the specified range
-        angle = Mathf.Clamp(angle, minRotation, maxRotation);
+        targetAngle = Mathf.Clamp(targetAngle, minRotation, maxRotation);
 
-        // Rotate the launcher
-        transform.rotation = Quaternion.Euler(new Vector3(0, 0, angle));
+        // Smoothly rotate the launcher using sensitivity
+        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, targetAngle));
+        transform.rotation = Quaternion.Slerp(
+            transform.rotation,
+            targetRotation,
+            rotationSensitivity * Time.deltaTime
+        );
     }
 
     void Shoot()
@@ -79,8 +89,10 @@ public class AntiAircraftLauncher : MonoBehaviour
         // Ensure cooldown period before shooting again
         if (Time.time > (currenttime + 0.5f))
         {
+            Debug.Log("Projectile shot");
             // Instantiate the projectile with the shoot point's rotation
-            GameObject bullet = Instantiate(Projectile, shootPoint.position, shootPoint.rotation);
+            //GameObject bullet = Instantiate(Projectile, shootPoint.position, shootPoint.rotation);
+            GameObject bullet = Instantiate(Projectile, newShootPoint);
 
             // Initialize the bullet's direction to match the cannon's rotation
             bullet.GetComponent<Projectile>().Initialize(shootPoint.up);

@@ -7,6 +7,7 @@ public class LevelSelection : MonoBehaviour
     private GameManager gm;
     public int checkLevelIndex;
     public static LevelSelection Instance;
+
     [SerializeField] private Button settingsButton;
     [SerializeField] private GameObject menubackButton;
     [SerializeField] private GameObject levelbackButton;

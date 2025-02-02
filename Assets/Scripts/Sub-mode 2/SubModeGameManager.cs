@@ -1,7 +1,6 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using System.Collections;
-using Unity.VisualScripting;
 
 public class SubModeGameManager : MonoBehaviour
 {
@@ -16,6 +15,7 @@ public class SubModeGameManager : MonoBehaviour
     private LevelSelection levelSelection;
     private GameManager gm;
     public static SubModeGameManager instance;
+    GameObject new_Aircraft;
 
     private void Awake()
     {
@@ -29,45 +29,66 @@ public class SubModeGameManager : MonoBehaviour
         gm = GameManager.instance;
         levelSelection = LevelSelection.Instance;
         Debug.Log(levelSelection.checkLevelIndex);
+
+        // Spawn anti-aircraft launcher based on level index
+
         if (gm.levelindex > 2)
         {
-            Instantiate(antiAircraftLaunchers[0], spawnPoint);
+             new_Aircraft = Instantiate(antiAircraftLaunchers[0], spawnPoint);
         }
         else
         {
-            Instantiate(antiAircraftLaunchers[1], spawnPoint);
+             new_Aircraft = Instantiate(antiAircraftLaunchers[1], spawnPoint);
         }
-
-        // Start the delayed game over check
-
     }
 
     private void Update()
     {
         if (checkGameOver)
         {
+            checkGameOver = false; // Prevent multiple coroutines
             StartCoroutine(CheckGameOverWithDelay());
-
         }
     }
 
     private IEnumerator CheckGameOverWithDelay()
     {
-        // Wait for 1.5 seconds
+        // Wait for 1 second
         yield return new WaitForSeconds(1f);
+        new_Aircraft.GetComponent<AntiAircraftLauncher>().enabled = false;
         transparent.SetActive(true);
         victoryCard.SetActive(true);
-        // After delay, set checkGameOver to true (or perform whatever action triggers victory)
-
     }
 
     public void NextButton()
     {
+        // Only proceed if total levels unlocked haven't exceeded the cap
         if (gm.totalLevelUnlocked < 20)
         {
-            gm.totalLevelUnlocked += 1;
+            // Calculate the level to unlock (current level index + 12)
+            int levelToUnlock = gm.levelindex + 12;
+
+            // Ensure the level to unlock is within bounds
+            if (levelToUnlock < gm.levelunlocked.Length)
+            {
+                // Unlock the level if it's not already unlocked
+                if (!gm.levelunlocked[levelToUnlock])
+                {
+                    gm.levelunlocked[levelToUnlock] = true;
+                    gm.totalLevelUnlocked += 1;
+                }
+                else
+                {
+                    Debug.Log("Level Already cleared");
+                }
+            }
+            else
+            {
+                Debug.LogError("Level to unlock is out of bounds!");
+            }
         }
 
+        // Load the scene AFTER processing unlocks
         SceneManager.LoadScene("LevelSelection");
     }
 
@@ -84,6 +105,7 @@ public class SubModeGameManager : MonoBehaviour
     public void Pause()
     {
         Time.timeScale = 0f;
+        new_Aircraft.GetComponent<AntiAircraftLauncher>().enabled = false;
         PauseUI.SetActive(true);
     }
 
@@ -96,6 +118,7 @@ public class SubModeGameManager : MonoBehaviour
     public void Cancel()
     {
         Time.timeScale = 1f;
+        new_Aircraft.GetComponent<AntiAircraftLauncher>().enabled = true;
         PauseUI.SetActive(false);
         SettingsUI.SetActive(false);
     }

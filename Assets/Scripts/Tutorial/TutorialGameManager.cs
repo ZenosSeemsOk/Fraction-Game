@@ -23,11 +23,24 @@ public class TutorialGameManager : MonoBehaviour
     }
     public void NextButton()
     {
-        SceneManager.LoadScene("Arcade Mode");
-        if(gm.totalLevelUnlocked < 20)
+    if (gm.totalLevelUnlocked < 20)
+    {
+        if (gm.levelindex >= 0 && gm.levelindex < gm.levelunlocked.Length)
         {
-            gm.totalLevelUnlocked += 1;
+            if (!gm.levelunlocked[gm.levelindex])
+            {
+                gm.levelunlocked[gm.levelindex] = true;
+                gm.totalLevelUnlocked += 1;
+            }
+            else
+            {
+                Debug.Log("Level Already Cleared");
+            }
         }
+    }
+
+    // Load next scene after unlocking logic
+    SceneManager.LoadScene("Arcade Mode");
 
     }
 

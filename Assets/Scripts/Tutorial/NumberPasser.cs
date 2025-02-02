@@ -10,6 +10,7 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     [SerializeField] private LineDivider lineDivider;
     private GameManager gm;
     [SerializeField] private Camera mainCamera;
+    [SerializeField] private RectTransform[] resetPos;
     private SnapToPosition snap;
     private bool isNumberHolderNumerator;
     private bool isNumberHolderDenominator;
@@ -25,34 +26,30 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
         {
             mainCamera = Camera.main;
         }
-        initialPos = transform.position;
     }
 
     private void Start()
     {
+        // Assign initialPos based on NumberValue
+        if (NumberValue > 0 && NumberValue <= resetPos.Length)
+        {
+            initialPos = resetPos[NumberValue - 1].position;
+        }
+
         tGameManager = TutorialGameManager.Instance;
         gm = GameManager.instance;
-        switch (gm.totalLevelUnlocked)
+
+        // Assign scaleValue based on gm.totalLevelUnlocked
+        scaleValue = gm.totalLevelUnlocked switch
+
         {
-            case 4:
-                scaleValue = 8;
-                break;
-            case 7:
-                scaleValue = 9;
-                break;
-            case 10:
-                scaleValue = 10;
-                break;
-            case 13:
-                scaleValue = 11;
-                break;
-            case 16:
-                scaleValue = 12;
-                break;
-            default:
-                scaleValue = 7;
-                break;
-        }
+            4 => 8,
+            7 => 9,
+            10 => 10,
+            13 => 11,
+            16 => 12,
+            _ => 7
+        };
     }
 
 

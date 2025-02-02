@@ -8,11 +8,15 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     private Vector3 offset;
     private Camera mainCamera;
     private SnapToPosition currentSnap;
-    private bool isSnapped = false;
+    public bool isSnapped = false;
     public int mistakeCount;
     public float value;
     private CardSpawner spawner;
     private Vector3 originalPosition;
+
+    [Header("Gizmos Settings")]
+    [SerializeField] private bool showGizmos = true; // Toggle gizmos on/off
+    [SerializeField] private Color gizmoColor = Color.yellow; // Color of the gizmo circle
 
     private void Awake()
     {
@@ -106,7 +110,7 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     {
         Collider2D[] overlappingColliders = Physics2D.OverlapCircleAll(
             transform.position,
-            1.0f // Increased detection radius
+            0.3f // Increased detection radius
         );
 
         SnapToPosition closestSnap = null;
@@ -185,5 +189,14 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
             if (snapPoint.answerKey != null) snapPoint.answerKey.SetActive(false);
             if (snapPoint.glow != null) snapPoint.glow.SetActive(false);
         }
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!showGizmos) return;
+
+        // Draw the detection radius as a wireframe circle
+        Gizmos.color = gizmoColor;
+        Gizmos.DrawWireSphere(transform.position, 0.4f); // Match the radius used in FindValidSnapPoint
     }
 }

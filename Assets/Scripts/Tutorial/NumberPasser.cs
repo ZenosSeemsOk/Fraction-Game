@@ -150,6 +150,24 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     private void OnTriggerExit2D(Collider2D other)
     {
+        // Check which trigger is exited and reset the corresponding LineDivider value
+        if (other.CompareTag("Number Holder Numerator"))
+        {
+            lineDivider.impNumeValue = 0;
+            Debug.Log("Numerator reset to 0");
+        }
+        else if (other.CompareTag("Number Holder Denominator"))
+        {
+            lineDivider.impDenoValue = 0;
+            Debug.Log("Denominator reset to 0");
+        }
+        else if (other.CompareTag("Denominator Holder"))
+        {
+            lineDivider.properDenoValue = 0;
+            Debug.Log("Proper denominator reset to 0");
+        }
+
+        // Reset flags and snap reference if exiting any valid holder
         if (other.CompareTag("Number Holder Numerator") || other.CompareTag("Number Holder Denominator") || other.CompareTag("Denominator Holder"))
         {
             ResetTriggerFlags();

@@ -2971,7 +2971,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0d4ba6c152a3bd44a4616b4d1836acc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  totalLevelUnlocked: 6
+  totalLevelUnlocked: 1
   levelindex: 0
   levelunlocked: 000000000000000000000000000000000000
 --- !u!4 &1580366507

@@ -8,6 +8,7 @@ public class CardSpawner : MonoBehaviour
 {
     [Header("Card Settings")]
     [SerializeField] private GameObject[] scalePrefab; // Array of scale prefabs for different divisions
+    [SerializeField] private AudioSource a_level;
     [SerializeField] private GameObject cardPrefab; // Prefab for cards
     [SerializeField] private Transform parentTransform; // Parent object for spawned cards
     [SerializeField] private Transform[] spawnPoints; // Spawn points for cards
@@ -20,6 +21,7 @@ public class CardSpawner : MonoBehaviour
     public UnityEvent OnSnapped = new UnityEvent();
     private GameManager gm;
     private LevelSelection levelSelection;
+    private musicManager mM;
 
     private int previousScaleDivisions; // To track changes in scale divisions
 
@@ -37,7 +39,7 @@ public class CardSpawner : MonoBehaviour
             Debug.LogError("GameManager instance is not assigned.");
             return;
         }
-
+        mM = musicManager.Instance;
         Debug.Log("GameManager instance found.");
         switch (levelSelection.checkLevelIndex)
         {
@@ -158,8 +160,25 @@ public class CardSpawner : MonoBehaviour
         yield return new WaitForSeconds(0.5f); // Reduced delay
         if (snapCount == numberOfCards)
         {
+            mM.PlayOnceClip("levelComplete");
             Debug.Log("Game Over: Confirmed");
             victoryCard.SetActive(true);
+
+            // Disable DragDrop2D component on all instantiated cards
+            DisableDragDropOnAllCards();
+        }
+    }
+
+    private void DisableDragDropOnAllCards()
+    {
+        // Iterate over all the cards in the parent transform
+        foreach (Transform child in parentTransform)
+        {
+            DragDrop2D dragDrop = child.GetComponent<DragDrop2D>();
+            if (dragDrop != null)
+            {
+                dragDrop.enabled = false; // Disable DragDrop2D component
+            }
         }
     }
 }

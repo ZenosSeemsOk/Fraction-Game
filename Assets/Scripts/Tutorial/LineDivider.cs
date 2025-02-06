@@ -11,6 +11,8 @@ public class LineDivider : MonoBehaviour
     public int impNumeValue;
     public int properDenoValue;
     public bool isSubmitted;
+    [SerializeField] AudioSource a_source;
+    [SerializeField] private AudioSource level_Complete;
     [SerializeField] Button pause;
     [SerializeField] Button settings;
     [SerializeField] GameObject correctIndicator;
@@ -23,6 +25,7 @@ public class LineDivider : MonoBehaviour
     [SerializeField] TextMeshProUGUI endMarkerTxt;
     [SerializeField] private GameObject tutorialVictoryCard;
     private LevelSelection levelSelection;
+    private musicManager mM;
     Vector2 size;
     [SerializeField] TextMeshProUGUI Visualfraction;
 
@@ -39,6 +42,7 @@ public class LineDivider : MonoBehaviour
     {
         tgm = TutorialGameManager.Instance;
         gm = GameManager.instance;
+        mM = musicManager.Instance;
         levelSelection = LevelSelection.Instance;
         size = GetComponent<RectTransform>().sizeDelta;
 
@@ -126,9 +130,10 @@ public class LineDivider : MonoBehaviour
             // Start coroutine to show victory card after 2 seconds
             if(SceneManager.GetActiveScene().name == "Tutorial")
             {
+                mM.PlayOnceClip("fraction_Display");
                 pause.interactable = false;
                 settings.interactable = false;
-                StartCoroutine(ShowVictoryCardAfterDelay(2f));
+                StartCoroutine(ShowVictoryCardAfterDelay(1.5f));
             }
 
         }
@@ -137,6 +142,7 @@ public class LineDivider : MonoBehaviour
     IEnumerator ShowVictoryCardAfterDelay(float delay)
     {
         yield return new WaitForSeconds(delay);
+        mM.PlayOnceClip("levelComplete");
         tutorialVictoryCard.SetActive(true);
     }
 

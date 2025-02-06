@@ -1,11 +1,19 @@
 using UnityEngine;
+using UnityEngine.UI;
+using System.Collections;
 using UnityEngine.SceneManagement;
 
 public class ArcadeSceneLevelManager : MonoBehaviour
 {
+    private float sfxVolume;
+    private float musicVolume;
+    [SerializeField] private Slider musicSldier;
+    [SerializeField] private Slider sfxSldier;
+    [SerializeField] private AudioSource a_source;
     [SerializeField] private GameObject PauseUI;
     [SerializeField] private GameObject SettingsUI;
     [SerializeField] private Transform cardParent;
+    private musicManager mM;
     private CardSpawner spawner;
     private GameManager gm;
 
@@ -13,12 +21,21 @@ public class ArcadeSceneLevelManager : MonoBehaviour
     {
 
         Time.timeScale = 1f;
+        mM = musicManager.Instance;
         gm = GameManager.instance;
         spawner = CardSpawner.Instance;
     }
 
     public void NextButton()
     {
+        StartCoroutine(WaitAndLoadNextScene());
+    }
+
+    private IEnumerator WaitAndLoadNextScene()
+    {
+        mM.PlayOnceClip("buttonClick");
+        yield return new WaitForSeconds(a_source.clip.length);
+
         // Only proceed if total levels unlocked haven't exceeded the cap
         if (gm.totalLevelUnlocked < 20)
         {
@@ -51,17 +68,20 @@ public class ArcadeSceneLevelManager : MonoBehaviour
 
     public void Restart()
     {
+        mM.PlayOnceClip("buttonClick");
         SceneManager.LoadScene("Arcade Mode");
     }
 
     public void Home()
     {
+        mM.PlayOnceClip("buttonClick");
         Debug.Log("Clicked");
         SceneManager.LoadScene("LevelSelection");
     }
 
     public void Pause()
     {
+        mM.PlayOnceClip("buttonClick");
         Time.timeScale = 0f;
         foreach (Transform child in cardParent)
         {
@@ -72,6 +92,7 @@ public class ArcadeSceneLevelManager : MonoBehaviour
 
     public void Cancel()
     {
+        mM.PlayOnceClip("buttonClick");
         Time.timeScale = 1f;
         foreach (Transform child in cardParent)
         {
@@ -81,8 +102,20 @@ public class ArcadeSceneLevelManager : MonoBehaviour
         SettingsUI.SetActive(false);
     }
 
+    public void sfxSlider(float vol)
+    {
+        mM.sfxVolume = vol;
+        PlayerPrefs.SetFloat("sfxVol", vol);
+    }
+    public void musicSlider(float vol)
+    {
+        mM.musicVolume = vol;
+        PlayerPrefs.SetFloat("musicVol", vol);
+    }
+
     public void Settings()
     {
+        mM.PlayOnceClip("buttonClick");
         Time.timeScale = 0f;
         foreach (Transform child in cardParent)
         {

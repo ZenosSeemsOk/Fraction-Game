@@ -1,16 +1,23 @@
+using System.Collections;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class LevelSelection : MonoBehaviour
 {
+    private float sfxVolume;
+    private float musicVolume;
     private GameManager gm;
     public int checkLevelIndex;
     public static LevelSelection Instance;
-
+    private musicManager mM;
+    [SerializeField] private Slider musicSldier;
+    [SerializeField] private Slider sfxSldier;
     [SerializeField] private Button settingsButton;
     [SerializeField] private GameObject menubackButton;
     [SerializeField] private GameObject levelbackButton;
+    [SerializeField] private GameObject SettingsUI;
     [SerializeField] private Button[] mainButtons;
     [SerializeField] private GameObject mainPanel;
     [SerializeField] private GameObject subPanel;
@@ -24,6 +31,7 @@ public class LevelSelection : MonoBehaviour
     }
     private void Start()
     {
+        mM = musicManager.Instance;
         gm = GameManager.instance;
         if(SceneManager.GetActiveScene().name == "LevelSelection")
         {
@@ -89,6 +97,7 @@ public class LevelSelection : MonoBehaviour
 
     public void OpenSubPanel(int levelIndex)
     {
+        mM.PlayOnceClip("levelClick");
         gm.levelindex = levelIndex;
         checkLevelIndex = levelIndex;
         // Hide the main panel and show the sub-panel
@@ -116,6 +125,8 @@ public class LevelSelection : MonoBehaviour
         }
     }
 
+    private bool isSceneTransitioning = false;
+
     public void ActivateSubButtons(int levelIndex)
     {
         // Ensure all sub-buttons are disabled initially
@@ -141,34 +152,71 @@ public class LevelSelection : MonoBehaviour
         // Add listeners for each sub-button to load the respective scene
         if (subButtons[levelIndex].Length > 0)
         {
-            subButtons[levelIndex][0].onClick.AddListener(() => LoadScene("Tutorial"));
+            subButtons[levelIndex][0].onClick.AddListener(() => PlayAudioAndLoadScene("Tutorial"));
         }
         if (subButtons[levelIndex].Length > 1)
         {
-            subButtons[levelIndex][1].onClick.AddListener(() => LoadScene("Arcade mode"));
+            subButtons[levelIndex][1].onClick.AddListener(() => PlayAudioAndLoadScene("Arcade mode"));
         }
         if (subButtons[levelIndex].Length > 2)
         {
-            subButtons[levelIndex][2].onClick.AddListener(() => LoadScene("Sub-mode 2"));
+            subButtons[levelIndex][2].onClick.AddListener(() => PlayAudioAndLoadScene("Sub-mode 2"));
         }
     }
 
-    // Method to load the scene by name
-    private void LoadScene(string sceneName)
+    // Method to play audio and load the scene when finished
+    private void PlayAudioAndLoadScene(string sceneName)
     {
-        SceneManager.LoadScene(sceneName);
+        if (!isSceneTransitioning)
+        {
+            isSceneTransitioning = true;
+            mM.PlayOnceClip("subLevelClick");
+            SceneManager.LoadScene(sceneName);
+            // Wait for the audio to finish before loading the scene
+            isSceneTransitioning = false;
+        }
     }
+
+    public void Cancel()
+    {
+        mM.PlayOnceClip("buttonClick");
+        Time.timeScale = 1f;
+        SettingsUI.SetActive(false);
+    }
+
+    public void sfxSlider(float vol)
+    {
+        mM.sfxVolume = vol;
+        PlayerPrefs.SetFloat("sfxVol", vol);
+    }
+    public void musicSlider(float vol)
+    {
+        mM.musicVolume = vol;
+        PlayerPrefs.SetFloat("musicVol", vol);
+    }
+
 
     public void BackToMainPanel()
     {
+        mM.PlayOnceClip("buttonClick");
+        isSceneTransitioning = false;
         menubackButton.SetActive(true);
         levelbackButton.SetActive(false);
         subPanel.SetActive(false);
         mainPanel.SetActive(true);
     }
 
+    public void Settings()
+    {
+        mM.PlayOnceClip("buttonClick");
+        Time.timeScale = 0f;
+        SettingsUI.SetActive(true);
+    }
+
     public void BackToMainMenu()
     {
+        mM.PlayOnceClip("buttonClick");
         SceneManager.LoadScene("MainMenu");
     }
+
 }

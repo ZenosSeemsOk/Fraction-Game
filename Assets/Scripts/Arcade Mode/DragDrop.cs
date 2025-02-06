@@ -5,6 +5,7 @@ using System.Collections;
 
 public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    private AudioSource m_Source;
     private Vector3 offset;
     private Camera mainCamera;
     private SnapToPosition currentSnap;
@@ -13,6 +14,7 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
     public float value;
     private CardSpawner spawner;
     private Vector3 originalPosition;
+    private musicManager mM;
 
     [Header("Gizmos Settings")]
     [SerializeField] private bool showGizmos = true; // Toggle gizmos on/off
@@ -31,6 +33,8 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         {
             spawner.OnSnapped.AddListener(WrongReset);
         }
+        mM = musicManager.Instance;
+        m_Source = GetComponent<AudioSource>();
     }
 
     public void OnBeginDrag(PointerEventData eventData)
@@ -143,6 +147,7 @@ public class DragDrop2D : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDr
         currentSnap = snap;
         currentSnap.isSnapped = true;
         isSnapped = true;
+        mM.PlayOnceClip("puzzle_Snapped");
         spawner.snapCount++;
         spawner.OnSnapped.Invoke();
 

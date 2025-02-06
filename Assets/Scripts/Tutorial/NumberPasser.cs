@@ -5,6 +5,7 @@ using System.Collections;
 
 public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
+    [SerializeField] private AudioSource a_source;
     private Vector3 offset;
     private int scaleValue = 6; // Default scale value
     [SerializeField] private LineDivider lineDivider;
@@ -19,7 +20,7 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
     private Vector3 initialPos;
     private TutorialGameManager tGameManager;
     private bool isResetting = false;
-
+    private musicManager mM;
     private void Awake()
     {
         if (mainCamera == null)
@@ -38,7 +39,7 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
         tGameManager = TutorialGameManager.Instance;
         gm = GameManager.instance;
-
+        mM = musicManager.Instance;
         // Assign scaleValue based on gm.totalLevelUnlocked
         scaleValue = gm.totalLevelUnlocked switch
 
@@ -81,6 +82,7 @@ public class NumberPasser : MonoBehaviour, IBeginDragHandler, IDragHandler, IEnd
 
     private void SnapToCorrectPosition()
     {
+        mM.PlayOnceClip("number_Placed");
         if (snap == null) return;
 
         Vector3 snapPosition = snap.transform.position;

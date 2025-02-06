@@ -7,10 +7,11 @@ public class MoveCard : MonoBehaviour
     [SerializeField] private SnapToPosition[] scalePoints;
     private GameManager gm;
     private CardSpawner spawner;
-
+    private musicManager mM;
     private void Start()
     {
         gm = GameManager.instance;
+        mM = musicManager.Instance;
         spawner = CardSpawner.Instance;
         if (gm.levelindex == 0 && !gm.levelunlocked[0])
         {
@@ -63,6 +64,7 @@ public class MoveCard : MonoBehaviour
                     .setDelay(1f)
                     .setOnComplete(() =>
                     {
+                        mM.PlayOnceClip("puzzle_Snapped");
                         spawner.snapCount++;
                         cardSnap.isSnapped = true;
                         cardSnap.enabled = false;

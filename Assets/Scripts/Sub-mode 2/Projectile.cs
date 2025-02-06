@@ -4,6 +4,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private float Speed;
+    [SerializeField] private AudioSource a_source;
 
     private Vector3 Direction;
 
@@ -22,6 +23,7 @@ public class Projectile : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D other)
     {
+        a_source.Play();
         Destroy(gameObject);
     }
 }

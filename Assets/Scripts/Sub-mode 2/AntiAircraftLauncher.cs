@@ -2,10 +2,13 @@ using UnityEngine;
 
 public class AntiAircraftLauncher : MonoBehaviour
 {
+    [SerializeField] private AudioSource m_source;
+    [SerializeField] private AudioSource m_source2;
     [SerializeField] private GameObject Projectile;
     [SerializeField] private GameObject trajectory;
     [SerializeField] private Transform shootPoint;
     [SerializeField] private RectTransform newShootPoint;
+    private SubModeGameManager gameManager;
     private Camera cam;
     private float currenttime;
 
@@ -20,22 +23,34 @@ public class AntiAircraftLauncher : MonoBehaviour
     public bool isHolding = false;
     private bool isSelected = false;
 
+    // Reference to pause manager (or you can use your own game manager logic)
+    private bool isPaused = false;
+
     private void Start()
     {
         cam = Camera.main;  // Assign the main camera automatically
         isHolding = false;
+        // Optionally: Subscribe to an event or method to update the pause state
+        // Example: GameManager.instance.OnPauseChanged += OnPauseChanged;
     }
 
     void Update()
     {
+        if (isPaused)
+        {
+            return;
+        }
+
         // Detect click on the launcher
         if (Input.GetMouseButtonDown(0))
         {
+
             Ray ray = cam.ScreenPointToRay(Input.mousePosition);
             RaycastHit2D hit = Physics2D.GetRayIntersection(ray);
 
             if (hit.collider != null && hit.collider.gameObject == gameObject)
             {
+                m_source.Play(); // Play sound only when interacting with the launcher
                 isSelected = true;
                 isHolding = true;
 
@@ -89,6 +104,7 @@ public class AntiAircraftLauncher : MonoBehaviour
         // Ensure cooldown period before shooting again
         if (Time.time > (currenttime + 0.5f))
         {
+            m_source2.Play(); // Play only if game is not paused
             Debug.Log("Projectile shot");
             // Instantiate the projectile with the shoot point's rotation
             //GameObject bullet = Instantiate(Projectile, shootPoint.position, shootPoint.rotation);
@@ -106,5 +122,11 @@ public class AntiAircraftLauncher : MonoBehaviour
                 Destroy(bullet, 2);
             }
         }
+    }
+
+    // Update this method when the pause state changes
+    public void SetPauseState(bool paused)
+    {
+        isPaused = paused;
     }
 }
